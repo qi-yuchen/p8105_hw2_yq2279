@@ -371,8 +371,8 @@ summary {
 
 <div id="problem-1" class="section level1">
 <h1>Problem 1</h1>
-<div id="read-and-clean-the-mr.-trash-wheel-sheet" class="section level2">
-<h2>Read and clean the Mr. Trash Wheel sheet</h2>
+<div id="read-and-clean-the-mr.-trash-wheel-sheet" class="section level3">
+<h3>Read and clean the Mr. Trash Wheel sheet</h3>
 <pre class="r"><code>data_trash = 
   read_excel(&quot;./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx&quot;, sheet = 1, range = &quot;A2:N336&quot;) %&gt;% 
   drop_na(Dumpster) %&gt;% 
@@ -381,8 +381,8 @@ summary {
 <pre><code>## Warning in FUN(X[[i]], ...): strings not representable in native encoding
 ## will be translated to UTF-8</code></pre>
 </div>
-<div id="read-and-clean-precipitation-data-for-2017-and-2018" class="section level2">
-<h2>Read and clean precipitation data for 2017 and 2018</h2>
+<div id="read-and-clean-precipitation-data-for-2017-and-2018" class="section level3">
+<h3>Read and clean precipitation data for 2017 and 2018</h3>
 <pre class="r"><code># read precipitation data for 2017
 data_pre2017 = 
   read_excel(&quot;./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx&quot;, sheet = 4, range = &quot;A2:B14&quot;) %&gt;% 
@@ -410,8 +410,8 @@ data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %&gt;%
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
-<div id="clean-the-data-in-pols-month.csv" class="section level2">
-<h2>clean the data in pols-month.csv</h2>
+<div id="clean-the-data-in-pols-month.csv" class="section level3">
+<h3>clean the data in pols-month.csv</h3>
 <pre class="r"><code>data_pols_month = read_csv(&quot;./data/pols-month.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;%
   separate(mon, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -435,8 +435,8 @@ data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %&gt;%
 ##   rep_dem = col_double()
 ## )</code></pre>
 </div>
-<div id="clean-the-data-in-snp.csv" class="section level2">
-<h2>Clean the data in snp.csv</h2>
+<div id="clean-the-data-in-snp.csv" class="section level3">
+<h3>Clean the data in snp.csv</h3>
 <pre class="r"><code>data_snp = read_csv(&quot;./data/snp.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;%
   separate(date, into = c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;) %&gt;%
@@ -452,8 +452,8 @@ data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %&gt;%
 ##   close = col_double()
 ## )</code></pre>
 </div>
-<div id="tidy-the-unemployment-data" class="section level2">
-<h2>Tidy the unemployment data</h2>
+<div id="tidy-the-unemployment-data" class="section level3">
+<h3>Tidy the unemployment data</h3>
 <pre class="r"><code>data_unemployment = read_csv(&quot;./data/unemployment.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;%
   pivot_longer(cols = jan:dec,
@@ -479,12 +479,15 @@ data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %&gt;%
 ##   Dec = col_double()
 ## )</code></pre>
 </div>
-<div id="join-the-datasets-by-merging-snp-into-pols-and-merging-unemployment-into-the-result" class="section level2">
-<h2>Join the datasets by merging snp into pols, and merging unemployment into the result</h2>
+<div id="join-the-datasets-by-merging-snp-into-pols-and-merging-unemployment-into-the-result" class="section level3">
+<h3>Join the datasets by merging snp into pols, and merging unemployment into the result</h3>
 <pre class="r"><code>pols_snp_unemployment = left_join(data_pols_month, data_snp, by = c(&quot;year&quot;, &quot;month&quot;)) %&gt;% 
   left_join(data_unemployment, by = c(&quot;year&quot;, &quot;month&quot;))</code></pre>
 <ul>
 <li>In data_pols_month, the number of observations is 822 and there are 9 variables. The range of year is from 1947 to 2015. The key variables are gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem, president.</li>
+<li>In data_snp, the number of observations is 787 and there are 3 variables. The range of year is from 1950 to 2015. The key variable is close.</li>
+<li>In data_unemployment, the number of observations is 816 and there are 3 variables. The range of year is from 1948 to 2015. The key variable is unemployment.</li>
+<li>In the joint dataset pols_snp_unemployment, the number of observations is 822 and there are 11 variables. The range of year is from 1947 to 2015. The key variables are gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem, president, close, unemployment.</li>
 </ul>
 </div>
 </div>

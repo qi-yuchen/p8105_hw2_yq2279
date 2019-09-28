@@ -14,7 +14,7 @@ library(readxl)
 
 # Problem 1
 
-## Read and clean the Mr. Trash Wheel sheet
+### Read and clean the Mr. Trash Wheel sheet
 
 ```{r}
 data_trash = 
@@ -25,7 +25,7 @@ data_trash =
 
 ```
 
-## Read and clean precipitation data for 2017 and 2018
+### Read and clean precipitation data for 2017 and 2018
 
 ```{r}
 # read precipitation data for 2017
@@ -56,7 +56,7 @@ data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %>%
 
 # Problem 2
 
-## clean the data in pols-month.csv
+### clean the data in pols-month.csv
 
 ```{r}
 data_pols_month = read_csv("./data/pols-month.csv") %>%
@@ -71,7 +71,7 @@ data_pols_month = read_csv("./data/pols-month.csv") %>%
   select(-day)
 ```
 
-## Clean the data in snp.csv
+### Clean the data in snp.csv
 
 ```{r}
 data_snp = read_csv("./data/snp.csv") %>%
@@ -85,7 +85,7 @@ data_snp = read_csv("./data/snp.csv") %>%
   mutate(year = as.character(year))
 ```
 
-## Tidy the unemployment data 
+### Tidy the unemployment data 
 ```{r}
 data_unemployment = read_csv("./data/unemployment.csv") %>%
   janitor::clean_names() %>%
@@ -97,10 +97,13 @@ data_unemployment = read_csv("./data/unemployment.csv") %>%
   mutate(year = as.character(year))
 ```
 
-## Join the datasets by merging snp into pols, and merging unemployment into the result
+### Join the datasets by merging snp into pols, and merging unemployment into the result
 ```{r}
 pols_snp_unemployment = left_join(data_pols_month, data_snp, by = c("year", "month")) %>% 
   left_join(data_unemployment, by = c("year", "month"))
 ```
 
 * In data_pols_month, the number of observations is `r nrow(data_pols_month)` and there are `r ncol(data_pols_month)` variables. The range of year is from `r range(pull(data_pols_month, year))[1]` to `r range(pull(data_pols_month, year))[2]`. The key variables are `r names(data_pols_month[3:9])`.
+* In data_snp, the number of observations is `r nrow(data_snp)` and there are `r ncol(data_snp)` variables. The range of year is from `r range(pull(data_snp, year))[1]` to `r range(pull(data_snp, year))[2]`. The key variable is `r names(data_snp[3])`.
+* In data_unemployment, the number of observations is `r nrow(data_unemployment)` and there are `r ncol(data_unemployment)` variables. The range of year is from `r range(pull(data_unemployment, year))[1]` to `r range(pull(data_unemployment, year))[2]`. The key variable is `r names(data_unemployment[3])`.
+* In the joint dataset pols_snp_unemployment, the number of observations is `r nrow(pols_snp_unemployment)` and there are `r ncol(pols_snp_unemployment)` variables. The range of year is from `r range(pull(pols_snp_unemployment, year))[1]` to `r range(pull(pols_snp_unemployment, year))[2]`. The key variables are `r names(pols_snp_unemployment[3:11])`.
