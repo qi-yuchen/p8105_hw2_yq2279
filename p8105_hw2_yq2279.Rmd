@@ -1,28 +1,106 @@
 ---
 title: "p8105_hw2_yq2279"
+author: "Qi Yuchen"
+date: "9/26/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
 ```
 
-## R Markdown
+# Problem 1
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Read and clean the Mr. Trash Wheel sheet
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+data_trash = 
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 1, range = "A2:N336") %>% 
+  drop_na(Dumpster) %>% 
+  janitor::clean_names() %>% 
+  mutate(sports_balls = as.integer(round(sports_balls)))
 
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+## Read and clean precipitation data for 2017 and 2018
 
-You can also embed plots, for example:
+```{r}
+# read precipitation data for 2017
+data_pre2017 = 
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14") %>% 
+  drop_na(Total) %>%   # omit rows without precipitation data
+  janitor::clean_names() %>% 
+  mutate(year = 2017)   # add a variable year
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# read precipitation data for 2018
+data_pre2018 = 
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>% 
+  drop_na(Total) %>%   # omit rows without precipitation data
+  janitor::clean_names() %>% 
+  mutate(year = 2018)   # add a variable year
+
+# combine precipitation datasets and convert month to a character variable
+data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %>% 
+  mutate(month = month.name[month])
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+* In the data from the Mr. Trash Wheel sheet, the number of observations is `r nrow(data_trash)`, and the key variables include weight_tons, plastic_bottles, polystyrene, cigarette_butts, glass_bottles, sports_balls, etc. 
+* In the precipitation data for 2017 and 2018, the number of observations is `r nrow(data_pre2017_2018)`, and the key variables include month and total. 
+* The total precipitation in 2018 is `r filter(data_pre2017_2018, year == 2018) %>% pull(total) %>% sum()`.
+* The median number of sports balls in a dumpster in 2017 is `r filter(data_trash, year == 2017) %>% pull(sports_balls) %>% median()`.
+
+
+# Problem 2
+
+## clean the data in pols-month.csv
+
+```{r}
+data_pols_month = read_csv("./data/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(month = month.name[as.numeric(month)]) %>% 
+  pivot_longer(cols = starts_with("prez"),
+               names_to = "president",
+               names_prefix = "prez_") %>%
+  filter(value != 0) %>% 
+  select(-value) %>% 
+  select(-day)
+```
+
+## Clean the data in snp.csv
+
+```{r}
+data_snp = read_csv("./data/snp.csv") %>%
+  janitor::clean_names() %>%
+  separate(date, into = c("month", "day", "year"), sep = "/") %>%
+  mutate(year = as.numeric(year), month = as.numeric(month)) %>% 
+  arrange(year, month) %>%
+  mutate(month = month.name[month]) %>%
+  select(year, month, everything()) %>% 
+  select(-day) %>% 
+  mutate(year = as.character(year))
+```
+
+## Tidy the unemployment data 
+```{r}
+data_unemployment = read_csv("./data/unemployment.csv") %>%
+  janitor::clean_names() %>%
+  pivot_longer(cols = jan:dec,
+               names_to = "month",
+               values_to = "unemployment") %>%
+  arrange(year, month) %>%
+  mutate(month = month.name[factor(month)]) %>% 
+  mutate(year = as.character(year))
+```
+
+## Join the datasets by merging snp into pols, and merging unemployment into the result
+```{r}
+pols_snp_unemployment = left_join(data_pols_month, data_snp, by = c("year", "month")) %>% 
+  left_join(data_unemployment, by = c("year", "month"))
+```
+
+* In data_pols_month, the number of observations is `r nrow(data_pols_month)` and there are `r ncol(data_pols_month)` variables. The range of year is from `r range(pull(data_pols_month, year))[1]` to `r range(pull(data_pols_month, year))[2]`. The key variables are `r names(data_pols_month[3:9])`.
