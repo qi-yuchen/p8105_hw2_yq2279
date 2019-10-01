@@ -18,7 +18,7 @@ library(readxl)
 
 ```{r}
 data_trash = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 1, range = "A2:N336") %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1, range = "A2:N336") %>% 
   drop_na(Dumpster) %>% 
   janitor::clean_names() %>% 
   mutate(sports_balls = as.integer(round(sports_balls)))
