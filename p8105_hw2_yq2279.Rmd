@@ -23,6 +23,7 @@ data_trash =
   janitor::clean_names() %>% 
   mutate(sports_balls = as.integer(round(sports_balls)))
 
+knitr::kable(data_trash[1:10,])
 ```
 
 ### Read and clean precipitation data for 2017 and 2018
@@ -30,14 +31,14 @@ data_trash =
 ```{r}
 # read precipitation data for 2017
 data_pre2017 = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14") %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2017 Precipitation", range = "A2:B14") %>% 
   drop_na(Total) %>%   # omit rows without precipitation data
   janitor::clean_names() %>% 
   mutate(year = 2017)   # add a variable year
 
 # read precipitation data for 2018
 data_pre2018 = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2018 Precipitation", range = "A2:B14") %>% 
   drop_na(Total) %>%   # omit rows without precipitation data
   janitor::clean_names() %>% 
   mutate(year = 2018)   # add a variable year
@@ -46,11 +47,12 @@ data_pre2018 =
 data_pre2017_2018 = bind_rows(data_pre2017, data_pre2018) %>% 
   mutate(month = month.name[month])
 
+knitr::kable(data_pre2017_2018[1:10,])
 ```
 
 * In the data from the Mr. Trash Wheel sheet, the number of observations is `r nrow(data_trash)`, and the key variables include weight_tons, plastic_bottles, polystyrene, cigarette_butts, glass_bottles, sports_balls, etc. 
-* In the precipitation data for 2017 and 2018, the number of observations is `r nrow(data_pre2017_2018)`, and the key variables include month and total. 
-* The total precipitation in 2018 is `r filter(data_pre2017_2018, year == 2018) %>% pull(total) %>% sum()`.
+* In the combined precipitation data for 2017 and 2018, the number of observations is `r nrow(data_pre2017_2018)`, and the key variable is total. The number of observations in 2017 and 2018 are `r nrow(data_pre2017)` and `r nrow(data_pre2018)` respectively, and the key variable is total in both. 
+* The total precipitation in 2018 is `r sum(pull(data_pre2018, total))`.
 * The median number of sports balls in a dumpster in 2017 is `r filter(data_trash, year == 2017) %>% pull(sports_balls) %>% median()`.
 
 
@@ -69,6 +71,8 @@ data_pols_month = read_csv("./data/pols-month.csv") %>%
   filter(value != 0) %>% 
   select(-value) %>% 
   select(-day)
+
+knitr::kable(data_pols_month[1:10,])
 ```
 
 ### Clean the data in snp.csv
@@ -83,6 +87,8 @@ data_snp = read_csv("./data/snp.csv") %>%
   select(year, month, everything()) %>% 
   select(-day) %>% 
   mutate(year = as.character(year))
+
+knitr::kable(data_snp[1:10,])
 ```
 
 ### Tidy the unemployment data 
@@ -95,12 +101,16 @@ data_unemployment = read_csv("./data/unemployment.csv") %>%
   arrange(year, month) %>%
   mutate(month = month.name[factor(month)]) %>% 
   mutate(year = as.character(year))
+
+knitr::kable(data_unemployment[1:10,])
 ```
 
 ### Join the datasets by merging snp into pols, and merging unemployment into the result
 ```{r}
 pols_snp_unemployment = left_join(data_pols_month, data_snp, by = c("year", "month")) %>% 
   left_join(data_unemployment, by = c("year", "month"))
+
+knitr::kable(pols_snp_unemployment[1:10,])
 ```
 
 * In data_pols_month, the number of observations is `r nrow(data_pols_month)` and there are `r ncol(data_pols_month)` variables. The range of year is from `r range(pull(data_pols_month, year))[1]` to `r range(pull(data_pols_month, year))[2]`. The key variables are `r names(data_pols_month[3:9])`.
@@ -139,7 +149,7 @@ data_Olivia =
     id_cols = ethnicity
     )
 
-data_Olivia
+knitr::kable(data_Olivia)
 ```
 
 ### Produce a table showing the most popular male name
@@ -152,7 +162,7 @@ data_male =
     id_cols = ethnicity
     )
 
-data_male
+knitr::kable(data_male)
 ```
 
 ### Produce a scatter plot about male white non-hispanic children born in 2016
